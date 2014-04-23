@@ -7,7 +7,9 @@ import akka.pattern.ask
 import akka.util.Timeout
 import scala.concurrent.duration._
 
-class ShortyService extends ShortyAPI with Actor {
+class ShortyService extends ShortyAPI {
+
+  import context.dispatcher
 
   val ds:ActorRef = context.system.actorOf(Props[URLDataStore],"datastore")
 
@@ -28,14 +30,14 @@ class ShortyService extends ShortyAPI with Actor {
       builder + CHAR_MAP(remainder)
     }
     val hashString: String = builder.toString()
-    context.system.child("datastore")
     ds ! STORE(hashString,url)
     hashString
   }
 
-  def redirectTo(id: String): Future[Response] = Future {
+  def redirectTo(id: String): Future[Response[String]] = Future {
+    implicit val timeout = Timeout(5 seconds)
     val f = ds ? GET(id)
-    val url = Await.result(f,Timeout(10 seconds).duration).asInstanceOf[String]
+    val url = Await.result(f,timeout.duration).asInstanceOf[String]
     NormalResponse("",ResponseStatus.TEMPORARY_REDIRECT,Map("Location" -> url))
   }
 

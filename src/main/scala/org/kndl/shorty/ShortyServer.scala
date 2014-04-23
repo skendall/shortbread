@@ -6,8 +6,14 @@ import com.twitter.finagle.http.Http
 import java.net.InetSocketAddress
 import net.fwbrasil.zoot.finagle.FinagleServer
 import net.fwbrasil.zoot.core.Server
+import scala.concurrent.ExecutionContext.Implicits.global
+import net.fwbrasil.zoot.core.mapper.JacksonStringMapper
 
-class ShortyServer extends App {
+object ShortyServer extends App {
+
+  private implicit val mirror = scala.reflect.runtime.currentMirror
+  private implicit val mapper = new JacksonStringMapper
+
   val system = ActorSystem.create("shortbread")
   system.actorOf(Props[ShortyService], "service")
   system.actorOf(Props[URLDataStore], "datastore")
@@ -17,7 +23,7 @@ class ShortyServer extends App {
       ServerBuilder()
         .codec(Http())
         .bindTo(new InetSocketAddress(9000))
-        .name("CounterServer")
+        .name("ShortbreadServer")
 
     new FinagleServer(Server[ShortyAPI](new ShortyService), serverBuilder.build)
   }

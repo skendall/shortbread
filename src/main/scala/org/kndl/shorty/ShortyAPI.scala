@@ -17,6 +17,6 @@ trait ShortyAPI extends Api {
     method = RequestMethod.GET,
     path = "/:id"
   )
-  def redirectTo(id: String): Future[Response]
+  def redirectTo(id: String): Future[Response[String]]
 
 }
