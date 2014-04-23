@@ -1,9 +1,15 @@
 package org.kndl.shorty
 
-import scala.concurrent.Future
+import scala.concurrent.{Await, Future}
 import net.fwbrasil.zoot.core.response.{ResponseStatus, NormalResponse, Response}
+import akka.actor.{Props, ActorRef, ActorSystem, Actor}
+import akka.pattern.ask
+import akka.util.Timeout
+import scala.concurrent.duration._
 
-class ShortyService extends ShortyAPI {
+class ShortyService extends ShortyAPI with Actor {
+
+  val ds:ActorRef = context.system.actorOf(Props[URLDataStore],"datastore")
 
   private val CHAR_MAP:Array[Char] = Array(
     'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z',
@@ -21,11 +27,19 @@ class ShortyService extends ShortyAPI {
       dividend = dividend >>> 6
       builder + CHAR_MAP(remainder)
     }
-    builder.toString()
+    val hashString: String = builder.toString()
+    context.system.child("datastore")
+    ds ! STORE(hashString,url)
+    hashString
   }
 
   def redirectTo(id: String): Future[Response] = Future {
-    NormalResponse("",ResponseStatus.TEMPORARY_REDIRECT,Map("Location" -> "http://cnn.com"))
+    val f = ds ? GET(id)
+    val url = Await.result(f,Timeout(10 seconds).duration).asInstanceOf[String]
+    NormalResponse("",ResponseStatus.TEMPORARY_REDIRECT,Map("Location" -> url))
   }
 
+  def receive = {
+    case _ =>
+  }
 }
