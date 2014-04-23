@@ -6,12 +6,9 @@ import akka.actor.{Props, ActorRef, ActorSystem, Actor}
 import akka.pattern.ask
 import akka.util.Timeout
 import scala.concurrent.duration._
+import scala.concurrent.ExecutionContext.Implicits.global
 
-class ShortyService extends ShortyAPI {
-
-  import context.dispatcher
-
-  val ds:ActorRef = context.system.actorOf(Props[URLDataStore],"datastore")
+class ShortyService(ds: ActorRef) extends ShortyAPI {
 
   private val CHAR_MAP:Array[Char] = Array(
     'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z',
@@ -41,7 +38,4 @@ class ShortyService extends ShortyAPI {
     NormalResponse("",ResponseStatus.TEMPORARY_REDIRECT,Map("Location" -> url))
   }
 
-  def receive = {
-    case _ =>
-  }
 }

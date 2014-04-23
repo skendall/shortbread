@@ -15,8 +15,7 @@ object ShortyServer extends App {
   private implicit val mapper = new JacksonStringMapper
 
   val system = ActorSystem.create("shortbread")
-  system.actorOf(Props[ShortyService], "service")
-  system.actorOf(Props[URLDataStore], "datastore")
+  val ds = system.actorOf(Props[URLDataStore], "datastore")
 
   val server = {
     val serverBuilder =
@@ -25,6 +24,6 @@ object ShortyServer extends App {
         .bindTo(new InetSocketAddress(9000))
         .name("ShortbreadServer")
 
-    new FinagleServer(Server[ShortyAPI](new ShortyService), serverBuilder.build)
+    new FinagleServer(Server[ShortyAPI](new ShortyService(ds)), serverBuilder.build)
   }
 }
