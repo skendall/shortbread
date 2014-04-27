@@ -1,12 +1,15 @@
 package org.kndl.shorty
 
 import scala.concurrent.{Await, Future}
-import net.fwbrasil.zoot.core.response.{ResponseStatus, NormalResponse, Response}
+import net.fwbrasil.zoot.core.response.{ExceptionResponse, ResponseStatus, NormalResponse, Response}
 import akka.actor.{Props, ActorRef, ActorSystem, Actor}
 import akka.pattern.ask
 import akka.util.Timeout
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
+import org.jboss.netty.handler.codec.http.{HttpRequest, HttpResponse}
+import com.twitter.finagle.Service
+import com.twitter.util
 
 class ShortyService(ds: ActorRef) extends ShortyAPI {
 
@@ -34,8 +37,8 @@ class ShortyService(ds: ActorRef) extends ShortyAPI {
   def redirectTo(id: String): Future[Response[String]] = Future {
     implicit val timeout = Timeout(5 seconds)
     val f = ds ? GET(id)
-    val url = Await.result(f,timeout.duration).asInstanceOf[String]
-    NormalResponse("",ResponseStatus.TEMPORARY_REDIRECT,Map("Location" -> url))
+    val url = Await.result(f,timeout.duration).asInstanceOf[URL]
+    // this is incredibly broken but required because Zoot does not allow writing headers/status codes
+    throw ExceptionResponse("",ResponseStatus.TEMPORARY_REDIRECT,Map("Location" -> url.url))
   }
-
 }

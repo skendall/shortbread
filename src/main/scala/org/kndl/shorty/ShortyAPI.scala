@@ -3,12 +3,12 @@ package org.kndl.shorty
 import net.fwbrasil.zoot.core.Api
 import net.fwbrasil.zoot.core.request.RequestMethod
 import scala.concurrent.Future
-import net.fwbrasil.zoot.core.response.Response
+import net.fwbrasil.zoot.core.response.{NormalResponse, Response}
 
 trait ShortyAPI extends Api {
 
   @endpoint(
-     method = RequestMethod.GET,
+     method = RequestMethod.POST,
      path = "/g"
   )
   def shortenURL(url: String): Future[String]
@@ -17,6 +17,6 @@ trait ShortyAPI extends Api {
     method = RequestMethod.GET,
     path = "/:id"
   )
-  def redirectTo(id: String): Future[Response[String]]
+  def redirectTo(id: String): Future[String]
 
 }
