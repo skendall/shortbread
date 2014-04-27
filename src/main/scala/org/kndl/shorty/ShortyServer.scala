@@ -15,7 +15,7 @@ object ShortyServer extends App {
   private implicit val mapper = new JacksonStringMapper
 
   val system = ActorSystem.create("shortbread")
-  val ds = system.actorOf(Props[URLDataStore], "datastore")
+  val ds = system.actorOf(Props[URLHandler], "datastore")
 
   val server = {
     val serverBuilder =

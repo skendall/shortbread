@@ -34,7 +34,7 @@ class ShortyService(ds: ActorRef) extends ShortyAPI {
     hashString
   }
 
-  def redirectTo(id: String): Future[Response[String]] = Future {
+  def redirectTo(id: String): Future[String] = Future {
     implicit val timeout = Timeout(5 seconds)
     val f = ds ? GET(id)
     val url = Await.result(f,timeout.duration).asInstanceOf[URL]
