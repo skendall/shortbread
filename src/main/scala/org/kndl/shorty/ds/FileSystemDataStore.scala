@@ -14,8 +14,11 @@ class FileSystemDataStore(baseDir:String) extends DataStore {
     if(!f.exists())
       "None"
     val reader = new BufferedReader(new FileReader(new File(dir,hash)))
-    val str = reader.readLine
-    val stored = str.unpickle[StoredURL]
+    var str = ""
+    var pickled = ""
+    while((str = reader.readLine) != null)
+      pickled += str
+    val stored = pickled.unpickle[StoredURL]
     stored.url
   }
 

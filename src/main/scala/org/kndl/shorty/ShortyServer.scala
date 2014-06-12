@@ -14,8 +14,11 @@ object ShortyServer extends App {
   private implicit val mirror = scala.reflect.runtime.currentMirror
   private implicit val mapper = new JacksonStringMapper
 
+  val service = new ShortyService()
+
   val system = ActorSystem.create("shortbread")
   val ds = system.actorOf(Props[URLHandler], "datastore")
+  val ss = system.actorOf(Props(service),"service")
 
   val server = {
     val serverBuilder =
@@ -24,6 +27,6 @@ object ShortyServer extends App {
         .bindTo(new InetSocketAddress(9000))
         .name("ShortbreadServer")
 
-    new FinagleServer(Server[ShortyAPI](new ShortyService(ds)), serverBuilder.build)
+    new FinagleServer(Server[ShortyAPI](service), serverBuilder.build)
   }
 }

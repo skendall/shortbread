@@ -16,6 +16,7 @@ class URLHandler extends Actor {
       sender ! STORED(true)
     }
     case GET(hash) => {
+      println("Sending url: " + db.getURL(hash))
       sender ! URL(db.getURL(hash))
     }
 

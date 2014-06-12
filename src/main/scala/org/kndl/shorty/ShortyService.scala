@@ -11,7 +11,7 @@ import org.jboss.netty.handler.codec.http.{HttpRequest, HttpResponse}
 import com.twitter.finagle.Service
 import com.twitter.util
 
-class ShortyService(ds: ActorRef) extends ShortyAPI {
+class ShortyService extends ShortyAPI with Actor {
 
   private val CHAR_MAP:Array[Char] = Array(
     'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z',
@@ -40,5 +40,9 @@ class ShortyService(ds: ActorRef) extends ShortyAPI {
     val url = Await.result(f,timeout.duration).asInstanceOf[URL]
     // this is incredibly broken but required because Zoot does not allow writing headers/status codes
     throw ExceptionResponse("",ResponseStatus.TEMPORARY_REDIRECT,Map("Location" -> url.url))
+  }
+
+  def receive = {
+    case _ => println("Got message")
   }
 }
