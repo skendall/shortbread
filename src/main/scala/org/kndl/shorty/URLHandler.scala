@@ -7,7 +7,7 @@ class URLHandler extends Actor {
 
   var urls:Map[String,String] = Map()
 
-  val db: DataStore = new FileSystemDataStore()
+  val db: DataStore = new FileSystemDataStore("urls")
 
   def receive = {
     case STORE(hash,url) => {

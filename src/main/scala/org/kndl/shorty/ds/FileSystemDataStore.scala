@@ -1,6 +1,6 @@
 package org.kndl.shorty.ds
 
-import java.io.{FileReader, PrintWriter, File}
+import java.io.{BufferedReader, FileReader, PrintWriter, File}
 import scala.pickling._
 import json._
 
@@ -13,7 +13,10 @@ class FileSystemDataStore(baseDir:String) extends DataStore {
     val f = new File(dir,hash)
     if(!f.exists())
       "None"
-    val reader = new FileReader(new File(dir,hash))
+    val reader = new BufferedReader(new FileReader(new File(dir,hash)))
+    val str = reader.readLine
+    val stored = str.unpickle[StoredURL]
+    stored.url
   }
 
   def storeURL(hash: String, url: String): Unit = {
@@ -21,7 +24,9 @@ class FileSystemDataStore(baseDir:String) extends DataStore {
     if(!dir.exists())
       dir.mkdir()
     val writer = new PrintWriter(new File(dir,hash))
-    writer.write(new StoredURL(hash,url,Map.empty[String,Integer]).pickle)
+    val data = new StoredURL(hash,url,Map.empty[String,Integer])
+    val str = data.pickle.toString
+    writer.write(str)
     writer.close()
   }
 
