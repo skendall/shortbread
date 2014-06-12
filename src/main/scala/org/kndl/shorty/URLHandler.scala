@@ -1,13 +1,13 @@
 package org.kndl.shorty
 
 import akka.actor.Actor
-import org.kndl.shorty.ds.{PersistentMapDataStore, DataStore}
+import org.kndl.shorty.ds.{FileSystemDataStore, DataStore}
 
 class URLHandler extends Actor {
 
   var urls:Map[String,String] = Map()
 
-  val db: DataStore = new PersistentMapDataStore()
+  val db: DataStore = new FileSystemDataStore()
 
   def receive = {
     case STORE(hash,url) => {
